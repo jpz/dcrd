@@ -2284,6 +2284,24 @@ func (b *blockManager) Start() {
 	bmgrLog.Trace("Starting block manager")
 	b.wg.Add(1)
 	go b.blockHandler()
+	if cfg.TerminateWhenCurrent {
+		b.terminateWhenCurrent()
+	}
+}
+
+// Starts a go routine that will signal the process to die, when it reaches current
+func (b *blockManager) terminateWhenCurrent() {
+	ticker := time.NewTicker(time.Microsecond * 1000)
+	go func() {
+		for range ticker.C {
+			if b.IsCurrent() {
+				bmgrLog.Infof("TerminateWhenCurrent - BlockChain appears to be Current, so sending signal to die")
+				p, _ := os.FindProcess(os.Getpid())
+				p.Signal(os.Interrupt)
+				break
+			}
+		}
+	}()
 }
 
 // Stop gracefully shuts down the block manager by stopping all asynchronous
