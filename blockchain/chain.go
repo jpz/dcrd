@@ -940,8 +940,8 @@ func (b *BlockChain) pruneStakeNodes() {
 //
 // This function is safe for concurrent access.
 func (b *BlockChain) BestPrevHash() chainhash.Hash {
-	b.chainLock.Lock()
-	defer b.chainLock.Unlock()
+	b.chainLock.RLock()
+	defer b.chainLock.RUnlock()
 
 	return b.bestNode.header.PrevBlock
 }
@@ -2086,7 +2086,7 @@ func (b *BlockChain) BestSnapshot() *BestState {
 // MaximumBlockSize returns the maximum permitted block size for the block
 // AFTER the given node.
 //
-// This function MUST be called with the chain state lock held (for reads).
+// This function MUST be called with the chain state lock held (for writes).
 func (b *BlockChain) maxBlockSize(prevNode *blockNode) (int64, error) {
 	// Hard fork voting on block size is only enabled on testnet v1 and
 	// simnet.

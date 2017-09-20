@@ -500,9 +500,9 @@ func (b *BlockChain) deploymentState(prevNode *blockNode, version uint32, deploy
 //
 // This function is safe for concurrent access.
 func (b *BlockChain) ThresholdState(hash *chainhash.Hash, version uint32, deploymentID string) (ThresholdStateTuple, error) {
-	b.chainLock.Lock()
+	b.chainLock.RLock()
 	node, ok := b.index[*hash]
-	b.chainLock.Unlock()
+	b.chainLock.RUnlock()
 	if !ok {
 		invalidState := ThresholdStateTuple{
 			State:  ThresholdInvalid,
